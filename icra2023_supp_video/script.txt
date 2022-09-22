@@ -1,0 +1,16 @@
+Title:
+
+We present DexPBT: Scaling up Dexterous Manipulation for Hand-Arm Systems with Population Based Training
+
+Intro:
+
+In this work, we introduce a new family of continuous control tasks focused on dexterous object manipulation.
+We target a robotic system consisting of an multi-fingered Allegro hand mounted on a Kuka arm with a total of 23 degrees of freedom.
+
+We apply Reinforcement Learning and Population-Based Training to find effective control policies in five different scenarios.
+
+Scenarios:
+
+First scenario is a single-arm regrasping.
+Here the task is to grasp the object and hold it in a specified location for one second.
+After each successful grasp, the object is moved to a new random position.
