@@ -11,6 +11,36 @@ We apply Reinforcement Learning and Population-Based Training to find effective 
 
 Scenarios:
 
-First scenario is a single-arm regrasping.
+First scenario is single-arm regrasping.
 Here the task is to grasp the object and hold it in a specified location for one second.
 After each successful grasp, the object is moved to a new random position.
+
+The next clip demonstrates the learned behavior on a throwing task.
+In this scenario, the goal is to grasp the object and displace it into a container.
+In the majority of environment configurations, the robot needs to release the grip and throw the object
+to reach the goal.
+
+The next task is reorientation.
+Here the robot needs to match both target position and orientation in space.
+To reach certain orientations our agents rotate the object in the hand using all fingers of the Allegro manipulator.
+This agent was trained on a distribution of different cuboids with dimensions ranging from 3 to 30 cm.
+
+In the following clips we demonstrate the agents trained on the two-arm tasks.
+The first one is a dual-arm regrasping.
+In this setup, both hand-arm systems are controlled by the same policy, resulting in a robot with 46 degrees of freedom.
+The environment is designed such that no one robot can finish the task alone since some the
+initial and target locations of the object are out of reach of one of the manipulators.
+
+The last scenario is dual-arm reorientation.
+Similar to the previous scenario, it is necessary to use both manipulators to complete the task.
+The predominant emergent behavior is to throw the object from one hand to the other, which allows the
+agent to reach the target orientation in the smallest amount of time.
+
+The following visualization shows the convex collision shapes used by the physics engine.
+Despite the relative complexity of the simulation, the parallel architecture of Isaac Gym and reinforcement learning algorithm optimized for GPU-side computation
+allow us to simulate 8192 robots simultaneously and reach a training throughput of 35.000 interactions per second on a single Nvidia V100 GPU.
+
+This visualization shows the convex collision shapes used by the physics engine.
+Despite the complexity of the scene, parallel simulation and reinforcement learning
+in Isaac Gym allow more than 8000 agents to be trained per GPU at a rate of 35,000 environment steps per second.
+This enables rapid learning with PBT across multiple GPUs, with each GPU training using different hyperparameters.
