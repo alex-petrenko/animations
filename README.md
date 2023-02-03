@@ -13,3 +13,15 @@ Therefore for complex animations ManimGL is recommended.
 Example command line (similar to just running manim from command line):
 `render icra2023_video_ce.py Title -q h -p`
 
+## Installation
+
+```shell
+# for manim-ce:
+pip install manim
+
+# for latex:
+sudo apt install texlive-latex-extra texlive-fonts-recommended texlive-generic-recommended
+
+# or full installation:
+sudo apt install texlive-full
+```
