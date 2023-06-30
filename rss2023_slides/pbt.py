@@ -10,7 +10,7 @@ class PBT(Scene):
         Animation explaining the mechanism of population based training.
         """
 
-        random.seed(42)
+        random.seed(43)
 
         final_anim = True
 
@@ -42,7 +42,7 @@ class PBT(Scene):
             self.play(*[Create(box) for box in boxes], *[Write(text) for text in fnames])
         else:
             self.add(*boxes, *fnames)
-        wait(1)
+        wait(0.1)
 
         # simulate how new checkpoints are added to each folder in the population
 
@@ -78,7 +78,7 @@ class PBT(Scene):
 
                 # generate checkpoint texts inside folder boxes
                 this_iter = iteration - delays[p]
-                text = Tex(f"p{p}-iter{this_iter:02d}-obj {fitness[p]:.2f}.pth", color=WHITE, font_size=20)
+                text = Tex(f"p{p}-iter{this_iter:02d}-obj{fitness[p]:.2f}.pth", color=WHITE, font_size=20)
                 text.next_to(boxes[p], DOWN, buff=-0.6 + this_iter * 0.35, aligned_edge=UP)
                 iter_checkpoints.append(text)
                 checkpoints[p].append(text)
@@ -88,7 +88,7 @@ class PBT(Scene):
                 self.play(*[Write(text) for text in iter_checkpoints])
             else:
                 self.add(*iter_checkpoints)
-            wait(1)
+            wait(0.5)
 
         # highlight animation for the chosen policy
         if final_anim:
@@ -113,6 +113,8 @@ class PBT(Scene):
             for c in selected_checkpoints:
                 c.set_color(YELLOW)
 
+        wait(1)
+
         checkpoint_fadeouts = []
         for p in range(8):
             for checkpoint in checkpoints[p]:
@@ -131,7 +133,7 @@ class PBT(Scene):
         headers = ["Policy index", "Checkpoint", "Objective"]
         headers = [Tex(h, color=WHITE, font_size=30) for h in headers]
         header_texts = VGroup(*headers)
-        header_texts.arrange(RIGHT, buff=1.8)
+        header_texts.arrange(RIGHT, buff=1.6)
         header_texts.to_corner(UL, buff=1)
 
         # add the table
@@ -157,23 +159,23 @@ class PBT(Scene):
         cp_move_anims = []
         for p in range(8):
             cp_move_anims.append(selected_checkpoints[p].animate.move_to(table[p].get_center() + 0.8 * RIGHT))
-        self.play(*cp_move_anims, run_time=0.5)
+        self.play(*cp_move_anims, run_time=1.0)
+        wait(1)
 
         cp_font_anims = []
         for p in range(8):
             cp_font_anims.append(selected_checkpoints[p].animate.set_font_size(24))
             cp_font_anims.append(selected_checkpoints[p].animate.set_color(WHITE))
-        self.play(*cp_font_anims, run_time=0.3)
+        self.play(*cp_font_anims, run_time=0.5)
 
         if final_anim:
             self.play(Write(header_texts))
-        else:
-            self.add(header_texts)
-
-        if final_anim:
             self.play(Write(table))
         else:
+            self.add(header_texts)
             self.add(table)
+
+        wait(1)
 
         row_pos = [table[i].get_center() for i in range(8)]
         # sort objective values
@@ -188,9 +190,11 @@ class PBT(Scene):
             row_move_anims.append(selected_checkpoints[p].animate.move_to(pos + 0.8 * RIGHT))
 
         if final_anim:
-            self.play(*row_move_anims, run_time=1)
+            self.play(*row_move_anims, run_time=1.5)
         else:
             self.play(*row_move_anims, run_time=0.001)
+
+        wait(1)
 
         top_p = Rectangle(GREEN, 1.8, 8.8).move_to(row_pos[1] + 0.3 * RIGHT)
         worst_p = Rectangle(RED, 1.8, 8.8).move_to(row_pos[-2] + 0.3 * RIGHT)
@@ -201,24 +205,25 @@ class PBT(Scene):
         checkpoint_to_red.append(selected_checkpoints[chosen_policy].animate.set_color(RED))
         self.play(*checkpoint_to_red, run_time=0.5)
         self.play(Create(worst_p))
+        wait(1)
 
         checkpoint_to_green = []
         for text in table[sorted_idx[1]]:
             checkpoint_to_green.append(text.animate.set_color(GREEN))
         checkpoint_to_green.append(selected_checkpoints[sorted_idx[1]].animate.set_color(GREEN))
         self.play(*checkpoint_to_green, run_time=0.5)
-
         self.play(Create(top_p))
+        wait(1)
 
         steps = Tex(
-            "\\begin{enumerate}"
+            "\\begin{itemize}"
             "\\item Load weights and hyperparameters\\\\from a top-performing policy"
             "\\item Randomly perturb hyperparameters"
-            "\\item Resume training..."
-            "\\end{enumerate}",
-            font_size=26,
+            "\\item Resume training!"
+            "\\end{itemize}",
+            font_size=25,
         )
-        steps.to_edge(RIGHT, buff=0.3)
+        steps.to_edge(RIGHT, buff=0.2)
 
         self.play(Write(steps))
 
