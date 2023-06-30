@@ -1,5 +1,5 @@
-from manimlib import *
 import numpy as np
+from manimlib import *
 
 
 class Title(Scene):
@@ -8,7 +8,9 @@ class Title(Scene):
     }
 
     def construct(self):
-        title_str = r"DexPBT: Scaling up Dexterous \\ Manipulation for Hand-Arm Systems \\ with Population Based Training"
+        title_str = (
+            r"DexPBT: Scaling up Dexterous \\ Manipulation for Hand-Arm Systems \\ with Population Based Training"
+        )
         title = TexText(title_str, font_size=72)
         self.add(title)
         self.wait(1)
@@ -18,7 +20,7 @@ class Title(Scene):
           \vspace{0.5em}
           $^1$NVIDIA, $^2$University of Southern California, $^3$University of Toronto"""
         author = TexText(author_str, font_size=28)
-        author.shift(DOWN*2)
+        author.shift(DOWN * 2)
 
         self.play(title.animate.shift(UP), FadeIn(author))
 
@@ -27,5 +29,3 @@ class Title(Scene):
         # fade out everything
         self.play(FadeOut(title), FadeOut(author))
         self.wait(0.1)
-
-

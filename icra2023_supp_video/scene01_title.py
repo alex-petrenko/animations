@@ -4,13 +4,14 @@ This is the version for manim community edition (Manim CE).
 
 from manim import *
 
-
 DEFAULT_WAIT = 5
 
 
 class Title(Scene):
     def construct(self):
-        title_str = r"DexPBT: Scaling up Dexterous \\ Manipulation for Hand-Arm Systems \\ with Population Based Training"
+        title_str = (
+            r"DexPBT: Scaling up Dexterous \\ Manipulation for Hand-Arm Systems \\ with Population Based Training"
+        )
         title = Tex(title_str, font_size=72)
         title.shift(0.5 * UP)
         self.add(title)
@@ -23,7 +24,7 @@ class Title(Scene):
           $^1$NVIDIA, $^2$University of Southern California, $^3$University of Toronto\\
         """
         author = Tex(author_str, font_size=32)
-        author.shift(DOWN*1.5)
+        author.shift(DOWN * 1.5)
         author.scale_to_fit_width(0.9 * config.frame_width)
 
         icra_str = r"ICRA 2023 Submission"
@@ -41,7 +42,7 @@ class Title(Scene):
 
         intro_str = [
             r"\textbf{Task:} dexterous object manipulation with a 23-DOF robotic hand-arm system (Allegro hand + KUKA arm).",
-            r"\textbf{Approach:} vectorized GPU-accelerated simulation, end-to-end Deep Reinforcement Learning, Population-Based Training."
+            r"\textbf{Approach:} vectorized GPU-accelerated simulation, end-to-end Deep Reinforcement Learning, Population-Based Training.",
         ]
         intro1, intro2 = intro = VGroup(
             Tex(intro_str[0], font_size=48),

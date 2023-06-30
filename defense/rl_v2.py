@@ -1,15 +1,14 @@
 import copy
 import random
 
-from manim import *
-
 import numpy as np
+from manim import *
 
 
 def texy_text(text, **kwargs):
     """Not using Tex, just a font that looks like Tex."""
-    if 'font_size' not in kwargs:
-        kwargs['font_size'] = 24
+    if "font_size" not in kwargs:
+        kwargs["font_size"] = 24
 
     text = Tex(text, **kwargs)
     return text
@@ -30,7 +29,7 @@ class SyncRL_V2(Scene):
         title = texy_text('Synchronous Reinforcement Learning "Version 2.0"', font_size=40)
 
         sim_color = "#f5602a"
-        
+
         description_squares = VGroup(
             description_square("Simulation (GPU)", sim_color),
             description_square("Inference (GPU)", ORANGE),
@@ -39,7 +38,7 @@ class SyncRL_V2(Scene):
         description_squares.arrange(RIGHT, buff=LARGE_BUFF)
 
         gpu_util_text, gpu_util_number = gpu_util_label = VGroup(
-            texy_text('GPU utilization, \\%', font_size=24),
+            texy_text("GPU utilization, \\%", font_size=24),
             DecimalNumber(
                 0,
                 show_ellipsis=False,
@@ -65,7 +64,7 @@ class SyncRL_V2(Scene):
 
         # add x axis tex label saying "time" to the x axis
         # x_axis_label = Text('time', font="Consolas", t2s={"time": ITALIC}, font_size=20)
-        x_axis_label = texy_text('time', font_size=24)
+        x_axis_label = texy_text("time", font_size=24)
 
         # position x axis label next to the tip of the x axis
         x_axis_label.next_to(x_axis.get_tip(), DOWN, SMALL_BUFF)
@@ -75,7 +74,7 @@ class SyncRL_V2(Scene):
         num_workers = 21 if debug else 21
 
         total_time_text, total_time_number = total_time_label = VGroup(
-            texy_text('Total time =', font_size=24),
+            texy_text("Total time =", font_size=24),
             DecimalNumber(
                 0,
                 show_ellipsis=True,
@@ -88,21 +87,21 @@ class SyncRL_V2(Scene):
         total_time_label.next_to(x_axis, UP, buff=SMALL_BUFF)
 
         frames_collected_text, frames_collected_number = frames_collected_label = VGroup(
-            texy_text('Observations collected ='),
+            texy_text("Observations collected ="),
             Integer(0, font_size=24),
         )
         frames_collected_label.arrange(RIGHT, buff=SMALL_BUFF)
         # frames_collected_label.next_to(total_time_label, UP, buff=MED_SMALL_BUFF)
 
         inference_steps_text, inference_steps_number = inference_steps_label = VGroup(
-            texy_text('Inference steps ='),
+            texy_text("Inference steps ="),
             Integer(0, font_size=24),
         )
         inference_steps_label.arrange(RIGHT, buff=SMALL_BUFF)
         # inference_steps_label.next_to(frames_collected_label, UP, buff=MED_SMALL_BUFF)
 
         backprop_steps_text, backprop_steps_number = backprop_steps_label = VGroup(
-            texy_text('Backpropagation steps ='),
+            texy_text("Backpropagation steps ="),
             Integer(0, font_size=24),
         )
         backprop_steps_label.arrange(RIGHT, buff=SMALL_BUFF)
@@ -152,13 +151,16 @@ class SyncRL_V2(Scene):
 
         total_frames_collected = total_inference_steps = total_backprop_steps = 0
 
-        total_cpu_time = total_gpu_time = total_time = 0
+        total_gpu_time = total_time = 0
 
         num_iterations = 2 if debug else 2
         for iteration in range(num_iterations):
             for step_idx, step_times_og in enumerate(step_times_arr):
                 step_times = copy.copy(step_times_og)
-                env_step_rects = [Rectangle(width=width, height=0.15, stroke_width=stroke, fill_color=sim_color, fill_opacity=1) for i in range(num_workers)]
+                env_step_rects = [
+                    Rectangle(width=width, height=0.15, stroke_width=stroke, fill_color=sim_color, fill_opacity=1)
+                    for i in range(num_workers)
+                ]
                 for i, t in enumerate(env_step_rects):
                     t.align_to(gpu_util_label.get_center(), UP)
 
@@ -203,8 +205,12 @@ class SyncRL_V2(Scene):
                     # cpu_util_number.set_value((100 * total_cpu_time) / (num_workers * total_time))
                     gpu_util_number.set_value(100 * total_gpu_time / (num_workers * total_time))
 
-                inference_height = abs((env_step_rects[-1].get_corner(DOWN + LEFT) - env_step_rects[0].get_corner(UP + LEFT))[1])
-                inference_rect = Rectangle(width=width, height=inference_height, stroke_width=stroke, fill_color=ORANGE, fill_opacity=1)
+                inference_height = abs(
+                    (env_step_rects[-1].get_corner(DOWN + LEFT) - env_step_rects[0].get_corner(UP + LEFT))[1]
+                )
+                inference_rect = Rectangle(
+                    width=width, height=inference_height, stroke_width=stroke, fill_color=ORANGE, fill_opacity=1
+                )
 
                 max_x_coord = np.array([-1e9, 0, 0])
                 for r in env_step_rects:
@@ -229,7 +235,9 @@ class SyncRL_V2(Scene):
                 gpu_util_number.set_value(100 * total_gpu_time / (num_workers * total_time))
 
                 if step_idx == len(step_times_arr) - 1:
-                    backprop_rect = Rectangle(width=width, height=inference_height, stroke_width=stroke, fill_color="#ffaf75", fill_opacity=1)
+                    backprop_rect = Rectangle(
+                        width=width, height=inference_height, stroke_width=stroke, fill_color="#ffaf75", fill_opacity=1
+                    )
                     backprop_rect.move_to(env_step_rects[0].get_top(), UP, coor_mask=np.array([0, 1, 0]))
                     backprop_rect.move_to(align_with + ofs, LEFT, coor_mask=np.array([1, 0, 0]))
                     self.add(backprop_rect)
