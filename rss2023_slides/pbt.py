@@ -14,6 +14,32 @@ class PBT(Scene):
 
         final_anim = True
 
+        def _write(text_, **kwargs):
+            if final_anim:
+                self.play(Write(text_, **kwargs))
+            else:
+                self.add(text_)
+
+        def _wait(t):
+            if final_anim:
+                self.wait(t)
+
+        # add title
+        title = Tex("Population-Based Training", font_size=60)
+        title.to_edge(UP)
+        _write(title)
+        _wait(0.5)
+
+        # add subtitle
+        shared_folders = Tex("Shared folders with policy checkpoints...", font_size=40)
+        training = Tex("Training...", font_size=40)
+        subtitles = VGroup(shared_folders, training)
+        subtitles.arrange(RIGHT, buff=1)
+
+        subtitles.next_to(title, DOWN, buff=0.35)
+        _write(shared_folders)
+        _wait(0.5)
+
         # add 8 boxes in a 2x4 grid. We only want a border around the outside, and transparent backgrounds
         # these designate the shared folders for 8 policies in the PBT population
         # now adding the boxes by direcly using the manim API:
@@ -27,22 +53,21 @@ class PBT(Scene):
                 box = Rectangle(color=WHITE, height=1.6, width=3, fill_opacity=0)  # No fill, only border
 
                 # Move to the proper position, centered on screen
-                box.shift(i * 2.5 * DOWN + j * 3.65 * RIGHT - 5.5 * RIGHT + 2 * UP)
+                box.shift(i * 2.5 * DOWN + j * 3.65 * RIGHT - 5.5 * RIGHT + 0.2 * UP)
                 text = Tex(f"/pbt/policy{i * 4 + j}", color=WHITE, font_size=30)
                 text.next_to(box, UP)  # Position text above box
 
                 boxes.append(box)
                 fnames.append(text)
 
-        def wait(t):
-            if final_anim:
-                self.wait(t)
-
         if final_anim:
             self.play(*[Create(box) for box in boxes], *[Write(text) for text in fnames])
         else:
             self.add(*boxes, *fnames)
-        wait(0.1)
+        _wait(0.1)
+
+        _write(training)
+        _wait(0.5)
 
         # simulate how new checkpoints are added to each folder in the population
 
@@ -88,13 +113,13 @@ class PBT(Scene):
                 self.play(*[Write(text) for text in iter_checkpoints])
             else:
                 self.add(*iter_checkpoints)
-            wait(0.5)
+            _wait(0.5)
 
         # highlight animation for the chosen policy
         if final_anim:
             self.play(boxes[chosen_policy].animate.set_color(YELLOW), run_time=0.5)
             self.play(Indicate(checkpoints[chosen_policy][-1], scale_factor=1.1))
-        wait(1)
+        _wait(1)
 
         # select corresponding checkpoint from other policies
         selected_checkpoints = []
@@ -113,7 +138,7 @@ class PBT(Scene):
             for c in selected_checkpoints:
                 c.set_color(YELLOW)
 
-        wait(1)
+        _wait(1)
 
         checkpoint_fadeouts = []
         for p in range(8):
@@ -122,10 +147,13 @@ class PBT(Scene):
                     checkpoint_fadeouts.append(checkpoint)
 
         if final_anim:
-            self.play(*[FadeOut(t) for t in fnames])
-            self.play(*[FadeOut(b) for b in boxes])
+            self.play(FadeOut(subtitles))
+            self.play(*[*[FadeOut(b) for b in boxes], *[FadeOut(f) for f in fnames]])
             self.play(*[FadeOut(c) for c in checkpoint_fadeouts])
         else:
+            self.remove(shared_folders)
+            self.remove(training)
+            self.remove(subtitles)
             self.remove(*fnames)
             self.remove(*boxes)
             self.remove(*checkpoint_fadeouts)
@@ -135,6 +163,7 @@ class PBT(Scene):
         header_texts = VGroup(*headers)
         header_texts.arrange(RIGHT, buff=1.6)
         header_texts.to_corner(UL, buff=1)
+        header_texts.shift(0.4 * DOWN)
 
         # add the table
         rows = []
@@ -154,13 +183,13 @@ class PBT(Scene):
         table = VGroup(*rows)
         table.arrange(DOWN, buff=0.35)
         table.to_corner(UL, buff=1)
-        table.shift(0.8 * DOWN)
+        table.shift(1.2 * DOWN)
 
         cp_move_anims = []
         for p in range(8):
             cp_move_anims.append(selected_checkpoints[p].animate.move_to(table[p].get_center() + 0.8 * RIGHT))
         self.play(*cp_move_anims, run_time=1.0)
-        wait(1)
+        _wait(1)
 
         cp_font_anims = []
         for p in range(8):
@@ -168,14 +197,9 @@ class PBT(Scene):
             cp_font_anims.append(selected_checkpoints[p].animate.set_color(WHITE))
         self.play(*cp_font_anims, run_time=0.5)
 
-        if final_anim:
-            self.play(Write(header_texts))
-            self.play(Write(table))
-        else:
-            self.add(header_texts)
-            self.add(table)
-
-        wait(1)
+        _write(header_texts)
+        _write(table)
+        _wait(1)
 
         row_pos = [table[i].get_center() for i in range(8)]
         # sort objective values
@@ -194,7 +218,7 @@ class PBT(Scene):
         else:
             self.play(*row_move_anims, run_time=0.001)
 
-        wait(1)
+        _wait(1)
 
         top_p = Rectangle(GREEN, 1.8, 8.8).move_to(row_pos[1] + 0.3 * RIGHT)
         worst_p = Rectangle(RED, 1.8, 8.8).move_to(row_pos[-2] + 0.3 * RIGHT)
@@ -205,7 +229,7 @@ class PBT(Scene):
         checkpoint_to_red.append(selected_checkpoints[chosen_policy].animate.set_color(RED))
         self.play(*checkpoint_to_red, run_time=0.5)
         self.play(Create(worst_p))
-        wait(1)
+        _wait(1)
 
         checkpoint_to_green = []
         for text in table[sorted_idx[1]]:
@@ -213,18 +237,52 @@ class PBT(Scene):
         checkpoint_to_green.append(selected_checkpoints[sorted_idx[1]].animate.set_color(GREEN))
         self.play(*checkpoint_to_green, run_time=0.5)
         self.play(Create(top_p))
-        wait(1)
+        _wait(1)
 
         steps = Tex(
             "\\begin{itemize}"
-            "\\item Load weights and hyperparameters\\\\from a top-performing policy"
-            "\\item Randomly perturb hyperparameters"
+            "\\item Load weights, hyperparameters,\\\\and reward coefficients\\\\from a top-performing policy"
+            "\\item Randomly perturb hyperparameters\\\\and shaping coefficients"
             "\\item Resume training!"
             "\\end{itemize}",
             font_size=25,
         )
         steps.to_edge(RIGHT, buff=0.2)
 
-        self.play(Write(steps))
+        _write(steps)
+
+        # fade out all checkpoints except the top and worst
+        fadeout_anims = []
+        for p in range(8):
+            if p != sorted_idx[1] and p != sorted_idx[-2]:
+                fadeout_anims.append(FadeOut(table[p]))
+                fadeout_anims.append(FadeOut(selected_checkpoints[p]))
+
+        self.play(*fadeout_anims)
+
+        # animate weights, hyperparameters, and reward coefficients being loaded from the top policy
+        weights = Tex("weights", font_size=28, color=GREEN)
+        weights.move_to(selected_checkpoints[sorted_idx[1]].get_center() + 0.5 * DOWN)
+
+        self.play(FadeIn(weights))
+        self.play(weights.animate.move_to(selected_checkpoints[chosen_policy].get_center() + 0.5 * UP))
+        self.play(FadeOut(weights))
+        del weights
+
+        hparams = Tex("perturb(hyperparameters)", font_size=28, color=GREEN)
+        hparams.move_to(selected_checkpoints[sorted_idx[1]].get_center() + 0.5 * DOWN)
+
+        self.play(FadeIn(hparams))
+        self.play(hparams.animate.move_to(selected_checkpoints[chosen_policy].get_center() + 0.5 * UP))
+        self.play(FadeOut(hparams))
+        del hparams
+
+        coeffs = Tex("perturb(reward_shaping_coefficients)", font_size=28, color=GREEN)
+        coeffs.move_to(selected_checkpoints[sorted_idx[1]].get_center() + 0.5 * DOWN)
+
+        self.play(FadeIn(coeffs))
+        self.play(coeffs.animate.move_to(selected_checkpoints[chosen_policy].get_center() + 0.5 * UP))
+        self.play(FadeOut(coeffs))
+        del coeffs
 
         self.wait(15)
